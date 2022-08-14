@@ -1,0 +1,33 @@
+{
+  "name": "bikegl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "serve": "webpack serve ",
+    "start": "http-server dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@deck.gl/core": "^8.8.8",
+    "@deck.gl/geo-layers": "^8.8.8",
+    "@deck.gl/layers": "^8.8.8",
+    "@luma.gl/core": "^8.5.16",
+    "deck.gl-leaflet": "^1.2.1",
+    "leaflet": "^1.8.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
+    "babel-loader": "^8.2.5",
+    "browserlist": "^1.0.1",
+    "copy-webpack-plugin": "^11.0.0",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.10.0"
+  }
+}
