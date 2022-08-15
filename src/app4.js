@@ -38,8 +38,8 @@ const scatter = new ScatterplotLayer({
     })
 
 
-function mkTrips(tm = 500) {
-  const trips = new TripsLayer({
+async function mkTrips(tm = 500) {
+  const trips = await new TripsLayer({
     id: 'TripsLayer',
     data: '/data/sf-trips.json',
     
@@ -80,6 +80,9 @@ function mkTrips(tm = 500) {
   return trips
 }    
 
+var trackData
+
+
   
 //new DeckGL({
 const deckgl = new Deck({
@@ -89,18 +92,25 @@ const deckgl = new Deck({
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
   controller: true,
-  layers: [scatter, mkTrips(500)]
+  layers: [scatter]
 });
   
 var tm = 0;
-function animate() {
+async function animate() {
+    if (tm == 0) {
+      // maybe we could load the data here and initialize all paths.
+      // don't know how to do this yet ...
+    }
     if (tm < 500) {
         tm += 10
         console.log("Current:",tm)
-        deckgl.setProps({layers: [scatter, mkTrips(tm)]});
+        const trips = await mkTrips(tm)
+        deckgl.setProps({layers: [scatter, trips]});
         setTimeout(animate,100)
     } else {
         console.log("Finished")
+        tm = 0
+        setTimeout(animate,100)
     }
 }
 
