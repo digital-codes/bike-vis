@@ -9,6 +9,10 @@ https://deck.gl/docs/api-reference/core/view
 
 https://ckochis.com/deck-gl-time-frame-animations
 
+https://deck.gl/docs/developer-guide/custom-layers/layer-lifecycle
+
+https://deck.gl/docs/faq
+
 */
 
 import {Deck} from '@deck.gl/core';
@@ -33,44 +37,48 @@ const scatter = new ScatterplotLayer({
       getRadius: d => d.radius
     })
 
-const trips = new TripsLayer({
-  id: 'TripsLayer',
-  data: '/data/sf-trips.json',
-  
-  /* props from TripsLayer class */
-  
-  currentTime: 500,
-  // fadeTrail: true,
-  getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
-  trailLength: 600,
-  
-  /* props inherited from PathLayer class */
-  
-  // billboard: false,
-  capRounded: true,
-  getColor: [253, 128, 93],
-  getPath: d => d.waypoints.map(p => p.coordinates),
-  // getWidth: 1,
-  jointRounded: true,
-  // miterLimit: 4,
-  // rounded: true,
-  // widthMaxPixels: Number.MAX_SAFE_INTEGER,
-  widthMinPixels: 8,
-  // widthScale: 1,
-  // widthUnits: 'meters',
-  
-  /* props inherited from Layer class */
-  
-  // autoHighlight: false,
-  // coordinateOrigin: [0, 0, 0],
-  // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
-  // highlightColor: [0, 0, 128, 128],
-  // modelMatrix: null,
-  opacity: 0.8,
-  // pickable: false,
-  // visible: true,
-  // wrapLongitude: false,
-});
+
+function mkTrips(tm = 500) {
+  const trips = new TripsLayer({
+    id: 'TripsLayer',
+    data: '/data/sf-trips.json',
+    
+    /* props from TripsLayer class */
+    
+    currentTime: tm,
+    // fadeTrail: true,
+    getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
+    trailLength: 600,
+    
+    /* props inherited from PathLayer class */
+    
+    // billboard: false,
+    capRounded: true,
+    getColor: [253, 128, 93],
+    getPath: d => d.waypoints.map(p => p.coordinates),
+    // getWidth: 1,
+    jointRounded: true,
+    // miterLimit: 4,
+    // rounded: true,
+    // widthMaxPixels: Number.MAX_SAFE_INTEGER,
+    widthMinPixels: 8,
+    // widthScale: 1,
+    // widthUnits: 'meters',
+    
+    /* props inherited from Layer class */
+    
+    // autoHighlight: false,
+    // coordinateOrigin: [0, 0, 0],
+    // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
+    // highlightColor: [0, 0, 128, 128],
+    // modelMatrix: null,
+    opacity: 0.8,
+    // pickable: false,
+    // visible: true,
+    // wrapLongitude: false,
+  });
+  return trips
+}    
 
   
 //new DeckGL({
@@ -81,26 +89,15 @@ const deckgl = new Deck({
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
   controller: true,
-  layers: [scatter, trips]
+  layers: [scatter, mkTrips(500)]
 });
   
 var tm = 0;
 function animate() {
-    console.log(deckgl)
-    console.log(trips)
     if (tm < 500) {
         tm += 10
         console.log("Current:",tm)
-        const context = trips.context
-        const props = trips.props
-        console.log(props)
-        var newProps = Object.assign(props)
-        console.log("initial:",newProps)
-        newProps.currentTime = tm
-        console.log("updated:",newProps)
-        //deckgl.tripsLayer.setProps({ currentTime: tm })
-        //trips.setProps({ currentTime: tm })
-        //trips.updateState({newProps, props, context}) //, changeFlags})
+        deckgl.setProps({layers: [scatter, mkTrips(tm)]});
         setTimeout(animate,100)
     } else {
         console.log("Finished")
