@@ -24,6 +24,7 @@ import {ScatterplotLayer} from '@deck.gl/layers';
 import {MapView} from '@deck.gl/core';
 
 const INITIAL_VIEW_STATE = {
+    toggle: true,
     longitude: -122.4,
     latitude: 37.74,
     zoom: 11,
@@ -86,43 +87,42 @@ async function mkTrips(tm = 500) {
 
 var trackData
 
-
-  
+ 
 //new DeckGL({
 const deckgl = new Deck({
     // The container to append the auto-created canvas to.
     parent: document.getElementById("#deck"), //document.body,
     canvas: "cv", // document.getElementById("#cv"), // unset
-    width: "100%", //"600px",
-    height: "300px",
-    mapStyle: '/data/sf-style.json', // trips
+    //width: "100%", //"600px",
+    //height: "300px",
+    //mapStyle: '/data/sf-style.json', // trips
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
   controller: true,
   layers: [scatter],
-
-  views: new MapView({
-    repeat: true,
-    // nearZMultiplier: 0.1,
-    // farZMultiplier: 1.01,
-    // orthographic: false,
-  }),
 
 });
   
 var tm = 0;
 var toggle = true
 
+function setView() {
+  const w = document.getElementById("setw").value
+  const h = document.getElementById("seth").value
+  console.log(w,h)
+  //deckgl.setProps({views:mkView(w,h)})
+  deckgl.setProps({width:w+"px"})
+  deckgl.setProps({height:h+"px"})
+  INITIAL_VIEW_STATE.toggle = !INITIAL_VIEW_STATE.toggle
+  deckgl.setProps({viewState: INITIAL_VIEW_STATE})
+}
+
 function setW(e) {
-  const v = e.target.value.toString()
-  console.log("W:",v) 
-  deckgl.setProps({width:v+"px"})
+  setView()
 }
 
 function setH(e) {
-  const v = e.target.value.toString()
-  console.log("H:",v) 
-  deckgl.setProps({height:v+"px"})
+  setView()
 }
 
 
@@ -136,20 +136,14 @@ async function animate() {
     }
     if (tm < 500) {
         tm += 10
-        console.log("Current:",tm)
+        //console.log("Current:",tm)
         const trips = await mkTrips(tm)
+        setView()
         deckgl.setProps({layers: [scatter, trips]});
         setTimeout(animate,100)
     } else {
         console.log("Finished")
         tm = 0
-        /*
-        if (toggle)
-          deckgl.setProps({width:"600px"})
-        else
-          deckgl.setProps({width:"400px"})
-        toggle = !toggle
-        */
         setTimeout(animate,100)
     }
 }
