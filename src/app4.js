@@ -109,7 +109,7 @@ var toggle = true
 function setView() {
   const w = document.getElementById("setw").value
   const h = document.getElementById("seth").value
-  console.log(w,h)
+  //console.log(w,h)
   //deckgl.setProps({views:mkView(w,h)})
   deckgl.setProps({width:w+"px"})
   deckgl.setProps({height:h+"px"})
@@ -125,17 +125,38 @@ function setH(e) {
   setView()
 }
 
+function setTm(e) {
+  const t = e.target.value
+  document.getElementById("tv").innerHTML = t
+  restartTime = parseInt(t)
+  console.log("Restart at: ", restartTime)
+}
+
+var restartTime = 0
+async function restart() {
+  const t = document.getElementById("sett").value
+  tm = restartTime
+  //const trips = await mkTrips(tm)
+  //deckgl.setProps({layers: [scatter, trips]});
+  //setTimeout(animate,100)
+}
 
 document.getElementById("setw").addEventListener("input",setW)
 document.getElementById("seth").addEventListener("input",setH)
+document.getElementById("sett").addEventListener("input",setTm)
+document.getElementById("restart").addEventListener("click",restart)
 
 async function animate() {
-    if (tm == 0) {
+  const tmVal = document.getElementById("tm") || null
+  if (tmVal != null)
+    tmVal.innerHTML = tm.toString()
+
+  if (tm == 0) {
       // maybe we could load the data here and initialize all paths.
       // don't know how to do this yet ...
     }
-    if (tm < 500) {
-        tm += 10
+    if (tm < 50000000) {
+        tm += 500
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)
         setView()
@@ -143,10 +164,10 @@ async function animate() {
         setTimeout(animate,100)
     } else {
         console.log("Finished")
-        tm = 0
+        tm = restartTime
         setTimeout(animate,100)
     }
-}
+  }
 
 setTimeout(animate,1000)
 

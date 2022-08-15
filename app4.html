@@ -18,6 +18,10 @@
       border: 1px solid slategray;
       overflow: hidden;
     }
+    #restart {
+      border: 1px solid #f00;
+      padding: 3px;
+    }
     </style>
 
   </head>
@@ -27,6 +31,13 @@
       <input id="setw" type="range" min="100" max="1000" value="600">
       <p>Height</p>
       <input id="seth" type="range" min="50" max="500" value="300">
+      <div>
+        <input id="sett" type="range" min="1" max="1000000" value="0"><span id="tv">1</span>
+        <button id="restart">Restart</button>
+      </div>
+
+      <p id="tm">123</p>
+
     </div> 
 
     <div id="deck">
