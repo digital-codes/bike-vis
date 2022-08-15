@@ -15,6 +15,11 @@ https://deck.gl/docs/faq
 
 https://stackoverflow.com/questions/59296549/deck-gl-without-react-but-with-webpack-is-not-rendered-the-specified-container
 
+https://deck.gl/docs/developer-guide/interactivity
+
+https://github.com/streamlit/streamlit/issues/475
+
+
 */
 
 import {Deck} from '@deck.gl/core';
