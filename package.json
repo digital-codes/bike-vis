@@ -13,8 +13,10 @@
   "license": "ISC",
   "dependencies": {
     "@deck.gl/core": "^8.8.8",
+    "@deck.gl/extensions": "^8.8.8",
     "@deck.gl/geo-layers": "^8.8.8",
     "@deck.gl/layers": "^8.8.8",
+    "@deck.gl/mesh-layers": "^8.8.8",
     "@luma.gl/core": "^8.5.16",
     "deck.gl-leaflet": "^1.2.1",
     "leaflet": "^1.8.0"

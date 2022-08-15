@@ -4,21 +4,21 @@ import {LeafletLayer} from 'deck.gl-leaflet';
 import {MapView} from '@deck.gl/core';
 import {GeoJsonLayer, ArcLayer} from '@deck.gl/layers';
 
-
-import {PhongMaterial} from '@luma.gl/core';
 import {AmbientLight, PointLight, LightingEffect} from '@deck.gl/core';
 
 import { TripsLayer } from '@deck.gl/geo-layers';
 
-// phongmaterial not exist in (new) luma
-/*
-const material = new PhongMaterial({
-  ambient: 0.1,
-  diffuse: 0.6,
-  shininess: 32,
-  specularColor: [60, 64, 70]
-});
-*/
+const INITIAL_VIEW_STATE = {
+  latitude: 52.500869,
+  longitude: 13.419047,
+	zoom: 16,
+	maxZoom: 15,
+  	minZoom: 13,
+	pitch: 45,
+	bearing: 0
+	};
+	
+
 
 const ambientLight = new AmbientLight({
 color: [255, 255, 255],
