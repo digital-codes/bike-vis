@@ -7,6 +7,7 @@ https://deck.gl/docs/get-started/using-standalone
 
 https://deck.gl/docs/api-reference/core/view
 
+https://ckochis.com/deck-gl-time-frame-animations
 
 */
 
@@ -83,3 +84,28 @@ const deckgl = new Deck({
   layers: [scatter, trips]
 });
   
+var tm = 0;
+function animate() {
+    console.log(deckgl)
+    console.log(trips)
+    if (tm < 500) {
+        tm += 10
+        console.log("Current:",tm)
+        const context = trips.context
+        const props = trips.props
+        console.log(props)
+        var newProps = Object.assign(props)
+        console.log("initial:",newProps)
+        newProps.currentTime = tm
+        console.log("updated:",newProps)
+        //deckgl.tripsLayer.setProps({ currentTime: tm })
+        //trips.setProps({ currentTime: tm })
+        //trips.updateState({newProps, props, context}) //, changeFlags})
+        setTimeout(animate,100)
+    } else {
+        console.log("Finished")
+    }
+}
+
+setTimeout(animate,1000)
+
