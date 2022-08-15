@@ -3,8 +3,27 @@
   <head>
     <meta charset='UTF-8' />
     <title>Trips example</title>
+
+    <style>
+    #deck {
+      position:relative;
+    }
+    #cv {
+      /* default settings for w and h, needed? */
+      /*
+      width: 600px;
+      height: 300px;
+      */
+      border: 1px solid slategray;
+      overflow: hidden;
+    }
+    </style>
+
   </head>
   <body>
-    <div id="deck"></div>
+    <div id="deck">
+      <canvas id="cv">
+      </canvas>
+    </div>
   </body>
 </html>

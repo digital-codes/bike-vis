@@ -13,6 +13,8 @@ https://deck.gl/docs/developer-guide/custom-layers/layer-lifecycle
 
 https://deck.gl/docs/faq
 
+https://stackoverflow.com/questions/59296549/deck-gl-without-react-but-with-webpack-is-not-rendered-the-specified-container
+
 */
 
 import {Deck} from '@deck.gl/core';
@@ -88,6 +90,9 @@ var trackData
 const deckgl = new Deck({
     // The container to append the auto-created canvas to.
     parent: document.getElementById("#deck"), //document.body,
+    canvas: "cv", // document.getElementById("#cv"), // unset
+    width: "100%", //"600px",
+    height: "300px",
     mapStyle: '/data/sf-style.json', // trips
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
@@ -96,6 +101,7 @@ const deckgl = new Deck({
 });
   
 var tm = 0;
+var toggle = true
 async function animate() {
     if (tm == 0) {
       // maybe we could load the data here and initialize all paths.
@@ -110,6 +116,11 @@ async function animate() {
     } else {
         console.log("Finished")
         tm = 0
+        if (toggle)
+          deckgl.setProps({width:"600px"})
+        else
+          deckgl.setProps({width:"400px"})
+        toggle = !toggle
         setTimeout(animate,100)
     }
 }
