@@ -21,6 +21,8 @@ import {Deck} from '@deck.gl/core';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import {ScatterplotLayer} from '@deck.gl/layers';
 
+import {MapView} from '@deck.gl/core';
+
 const INITIAL_VIEW_STATE = {
     longitude: -122.4,
     latitude: 37.74,
@@ -97,11 +99,36 @@ const deckgl = new Deck({
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
   controller: true,
-  layers: [scatter]
+  layers: [scatter],
+
+  views: new MapView({
+    repeat: true,
+    // nearZMultiplier: 0.1,
+    // farZMultiplier: 1.01,
+    // orthographic: false,
+  }),
+
 });
   
 var tm = 0;
 var toggle = true
+
+function setW(e) {
+  const v = e.target.value.toString()
+  console.log("W:",v) 
+  deckgl.setProps({width:v+"px"})
+}
+
+function setH(e) {
+  const v = e.target.value.toString()
+  console.log("H:",v) 
+  deckgl.setProps({height:v+"px"})
+}
+
+
+document.getElementById("setw").addEventListener("input",setW)
+document.getElementById("seth").addEventListener("input",setH)
+
 async function animate() {
     if (tm == 0) {
       // maybe we could load the data here and initialize all paths.
@@ -116,11 +143,13 @@ async function animate() {
     } else {
         console.log("Finished")
         tm = 0
+        /*
         if (toggle)
           deckgl.setProps({width:"600px"})
         else
           deckgl.setProps({width:"400px"})
         toggle = !toggle
+        */
         setTimeout(animate,100)
     }
 }
