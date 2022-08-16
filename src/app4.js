@@ -26,7 +26,24 @@ import {Deck} from '@deck.gl/core';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import {ScatterplotLayer} from '@deck.gl/layers';
 
-import {MapView} from '@deck.gl/core';
+//import {MapView} from '@deck.gl/core';
+
+import {AmbientLight, PointLight, LightingEffect} from '@deck.gl/core';
+
+
+const ambientLight = new AmbientLight({
+  color: [255, 255, 255],
+  intensity: 1.0
+});
+
+const pointLight = new PointLight({
+  color: [255, 255, 255],
+  intensity: 2.0,
+  position: [-74.05, 40.7, 8000]
+});
+
+const lightingEffect = new LightingEffect({ambientLight, pointLight});
+
 
 const INITIAL_VIEW_STATE = {
     toggle: true,
@@ -47,17 +64,19 @@ const scatter = new ScatterplotLayer({
       getRadius: d => d.radius
     })
 
+var tripData = []
 
 async function mkTrips(tm = 500) {
   const trips = await new TripsLayer({
     id: 'TripsLayer',
-    data: '/data/sf-trips.json',
+    data: tripData, // '/data/sf-trips.json',
     
     /* props from TripsLayer class */
     
     currentTime: tm,
-    // fadeTrail: true,
-    getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
+    //fadeTrail: true,
+    // modify timetamps
+    //getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
     trailLength: 600,
     
     /* props inherited from PathLayer class */
@@ -104,6 +123,7 @@ const deckgl = new Deck({
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
   controller: true,
+  effects: [lightingEffect],
   layers: [scatter],
 
 });
@@ -160,8 +180,8 @@ async function animate() {
       // maybe we could load the data here and initialize all paths.
       // don't know how to do this yet ...
     }
-    if (tm < 50000000) {
-        tm += 500
+    if (tm < 10000) {
+        tm += 10
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)
         setView()
@@ -174,5 +194,15 @@ async function animate() {
     }
   }
 
-setTimeout(animate,1000)
+// load data 
+fetch("/data/trips.json")
+.then((response) => response.json())
+.then((data) => {
+  console.log(data.data)
+  tripData = data.data
+  setTimeout(animate,1000)
+  }
+)
+
+//setTimeout(animate,1000)
 
