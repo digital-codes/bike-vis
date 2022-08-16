@@ -31,6 +31,8 @@
       <input id="setw" type="range" min="100" max="1000" value="600">
       <p>Height</p>
       <input id="seth" type="range" min="50" max="500" value="300">
+      <p>Speed</p>
+      <input id="sets" type="range" min="10" max="500" value="10">
       <div>
         <input id="sett" type="range" min="1" max="10000" value="0"><span id="tv">1</span>
         <button id="restart">Restart</button>
@@ -39,7 +41,11 @@
       <p id="tm">123</p>
 
     </div> 
-
+    <!--
+      we can scale the container to adjust canvas size
+      transform: scale(.4);
+      transform-origin: left;
+    -->
     <div id="deck">
       <canvas id="cv">
       </canvas>

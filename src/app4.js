@@ -19,12 +19,16 @@ https://deck.gl/docs/developer-guide/interactivity
 
 https://github.com/streamlit/streamlit/issues/475
 
+https://deck.gl/docs/api-reference/layers/bitmap-layer
+
 
 */
 
 import {Deck} from '@deck.gl/core';
 import { TripsLayer } from '@deck.gl/geo-layers';
 import {ScatterplotLayer} from '@deck.gl/layers';
+import {PolygonLayer} from '@deck.gl/layers';
+import {BitmapLayer} from '@deck.gl/layers';
 
 //import {MapView} from '@deck.gl/core';
 
@@ -32,21 +36,32 @@ import {AmbientLight, PointLight, LightingEffect} from '@deck.gl/core';
 
 
 const ambientLight = new AmbientLight({
-  color: [255, 255, 255],
+  color: [0, 0, 255],
   intensity: 1.0
 });
 
 const pointLight = new PointLight({
-  color: [255, 255, 255],
+  color: [0, 255, 0],
   intensity: 2.0,
-  position: [-74.05, 40.7, 8000]
+  position: [-122.42, 37.75, 10000]
 });
 
 const lightingEffect = new LightingEffect({ambientLight, pointLight});
 
+const material = {
+  ambient: 0.5,
+  diffuse: 0.6,
+  shininess: 32,
+  specularColor: [60, 64, 170]
+};
+
+const DEFAULT_THEME = {
+  bgColor: [0,0,50],
+  material,
+  effects: [lightingEffect]
+};
 
 const INITIAL_VIEW_STATE = {
-    toggle: true,
     longitude: -122.4,
     latitude: 37.74,
     zoom: 11,
@@ -61,8 +76,55 @@ const scatter = new ScatterplotLayer({
         {position: [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude], color: [255, 0, 0], radius: 100}
       ],
       getColor: d => d.color,
-      getRadius: d => d.radius
+      getRadius: d => d.radius,
+      getFillColor: [0,0,100],
+      material: DEFAULT_THEME.material
     })
+
+const bg = new PolygonLayer({
+  id: 'bg',
+  data: [
+    /* 
+    first: 8, second: y
+    larger x => left
+    larger y: up
+    */
+    {
+      "height": 17,
+      "polygon": [
+        [-122.3, 37.8],
+        [-122.5, 37.8],
+        [-122.5, 37.68],
+        [-122.3, 37.68],
+      ]
+    },
+    {
+      "height": 30,
+      "polygon": [
+        [-122.35, 37.75],
+        [-122.4, 37.75],
+        [-122.4, 37.7],
+        [-122.35, 37.7],
+      ]
+    }
+  ],
+  extruded: true,
+  wireframe: false,
+  opacity: 0.1,
+  getPolygon: f => f.polygon,
+  getElevation: f => f.height,
+  getFillColor: DEFAULT_THEME.bgColor,
+  material: DEFAULT_THEME.material
+})
+
+const bmap = new BitmapLayer({
+  id: 'bitmap-layer',
+  opacity: .3,
+  bounds: [-122.42, 37.68, -122.32, 37.78],
+  image: '/data/sf-districts.png'
+});
+
+
 
 var tripData = []
 
@@ -78,13 +140,14 @@ async function mkTrips(tm = 500) {
     // modify timetamps
     //getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
     getTimestamps: d => d.waypoints.map(p => p.timestamp),
+    //getColor: [253, 128, 93],
+    getColor: d => d.waypoints.map(p => p.color),
     trailLength: 600,
     
     /* props inherited from PathLayer class */
     
     // billboard: false,
     capRounded: true,
-    getColor: [253, 128, 93],
     getPath: d => d.waypoints.map(p => p.coordinates),
     // getWidth: 1,
     jointRounded: true,
@@ -106,6 +169,7 @@ async function mkTrips(tm = 500) {
     // pickable: false,
     // visible: true,
     // wrapLongitude: false,
+  
   });
   return trips
 }    
@@ -124,13 +188,13 @@ const deckgl = new Deck({
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
   controller: true,
-  effects: [lightingEffect],
-  layers: [scatter],
+  effects: DEFAULT_THEME.effects,
+  layers: [scatter,bmap,bg],
 
 });
   
 var tm = 0;
-var toggle = true
+var speed = 10
 
 function setView() {
   const w = document.getElementById("setw").value
@@ -139,8 +203,8 @@ function setView() {
   //deckgl.setProps({views:mkView(w,h)})
   deckgl.setProps({width:w+"px"})
   deckgl.setProps({height:h+"px"})
-  INITIAL_VIEW_STATE.toggle = !INITIAL_VIEW_STATE.toggle
-  deckgl.setProps({viewState: INITIAL_VIEW_STATE})
+  // setting the initial state here prevents mouse controls!! 
+  //deckgl.setProps({viewState: INITIAL_VIEW_STATE})
 }
 
 function setW(e) {
@@ -149,6 +213,11 @@ function setW(e) {
 
 function setH(e) {
   setView()
+}
+
+function setS(e) {
+  speed = parseInt(e.target.value)
+  console.log("Speed:",speed)
 }
 
 function setTm(e) {
@@ -170,6 +239,7 @@ async function restart() {
 document.getElementById("setw").addEventListener("input",setW)
 document.getElementById("seth").addEventListener("input",setH)
 document.getElementById("sett").addEventListener("input",setTm)
+document.getElementById("sets").addEventListener("input",setS)
 document.getElementById("restart").addEventListener("click",restart)
 
 async function animate() {
@@ -182,11 +252,11 @@ async function animate() {
       // don't know how to do this yet ...
     }
     if (tm < 15000) {
-        tm += 10
+        tm += speed
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)
         setView()
-        deckgl.setProps({layers: [scatter, trips]});
+        deckgl.setProps({layers: [trips, scatter, bmap, bg]});
         setTimeout(animate,100)
     } else {
         console.log("Finished")

@@ -6,6 +6,16 @@ import copy
 df = pd.read_json("sf-trips.json")
 print("Trips: ",df.waypoints.count())
 
+colors = [
+    [200,100,0],
+    [200,0,100],
+    [0,100,200],
+    [0,100,100],
+    [200,200,0],
+    [100,200,100],
+    ]
+
+
 trips = []
 
 # update timestamps
@@ -14,19 +24,20 @@ for i in df.waypoints:
     for s in i:
         s["timestamp"] = ts
         ts += random.randint(10,100)
+        s["color"] = colors[0]
     trips.append({"waypoints":i})
-
 
 for i in range(5):
     trip = copy.deepcopy(trips[0])
     tm = trip["waypoints"][0]["timestamp"]
     print("Start :",tm)
-    for w in trip["waypoints"]:
+    for j,w in enumerate(trip["waypoints"]):
         tm += random.randint(100,1000)
         w["timestamp"] += tm + i * 1000
         print(w["timestamp"])
         w["coordinates"][0] += random.randint(-1000,1000)/1000000      
-        w["coordinates"][1] += random.randint(-1000,1000)/1000000      
+        w["coordinates"][1] += random.randint(-1000,1000)/1000000
+        w["color"] = colors[i+1]
 
     trips.append(trip)        
 
