@@ -5,20 +5,21 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
-    index: './src/app4.js',  
+    //index: './src/app4.js',  
+    index: './src/bike-app.js',  
   },
   plugins: [
     new HtmlWebpackPlugin({
       title: 'Webpack Test Project',
       // only for app4
-      template: 'app4.html',
+      //template: 'app4.html',
       meta: [
         {"description":"bla bla bla"},
       ],
       // Only for leaflet 
       // adjust for other apps needing a custom template
       // remove if not required
-      //template: 'leaflet.html'
+      template: 'leaflet.html'
     }),
     new CopyPlugin({
       patterns: [
