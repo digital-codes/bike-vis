@@ -69,7 +69,7 @@ var tripData = []
 async function mkTrips(tm = 500) {
   const trips = await new TripsLayer({
     id: 'TripsLayer',
-    data: tripData, // '/data/sf-trips.json',
+    data: '/data/trips2.json', // sf-trips.json',
     
     /* props from TripsLayer class */
     
@@ -77,6 +77,7 @@ async function mkTrips(tm = 500) {
     //fadeTrail: true,
     // modify timetamps
     //getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
+    getTimestamps: d => d.waypoints.map(p => p.timestamp),
     trailLength: 600,
     
     /* props inherited from PathLayer class */
@@ -180,7 +181,7 @@ async function animate() {
       // maybe we could load the data here and initialize all paths.
       // don't know how to do this yet ...
     }
-    if (tm < 10000) {
+    if (tm < 15000) {
         tm += 10
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)
@@ -194,7 +195,8 @@ async function animate() {
     }
   }
 
-// load data 
+/*
+  // load data 
 fetch("/data/trips.json")
 .then((response) => response.json())
 .then((data) => {
@@ -203,6 +205,6 @@ fetch("/data/trips.json")
   setTimeout(animate,1000)
   }
 )
-
-//setTimeout(animate,1000)
+*/
+setTimeout(animate,1000)
 
