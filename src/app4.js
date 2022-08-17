@@ -21,6 +21,7 @@ https://github.com/streamlit/streamlit/issues/475
 
 https://deck.gl/docs/api-reference/layers/bitmap-layer
 
+https://deck.gl/docs/api-reference/geo-layers/tile-layer
 
 */
 
@@ -29,6 +30,7 @@ import { TripsLayer } from '@deck.gl/geo-layers';
 import {ScatterplotLayer} from '@deck.gl/layers';
 import {PolygonLayer} from '@deck.gl/layers';
 import {BitmapLayer} from '@deck.gl/layers';
+import {TileLayer} from '@deck.gl/geo-layers';
 
 //import {MapView} from '@deck.gl/core';
 
@@ -65,6 +67,7 @@ const INITIAL_VIEW_STATE = {
     longitude: -122.4,
     latitude: 37.74,
     zoom: 11,
+    minZoom: 0,
     maxZoom: 20,
     pitch: 0, // (Number, optional) - pitch angle in degrees. Default 0 (top-down). was 30
     bearing: 0 //  (Number, optional) - bearing angle in degrees. Default 0 (north).
@@ -121,9 +124,30 @@ const bmap = new BitmapLayer({
   id: 'bitmap-layer',
   opacity: .3,
   bounds: [-122.42, 37.68, -122.32, 37.78],
-  image: '/data/sf-districts.png'
+  image: '/assets/media/sf-districts.png'
 });
 
+const tiles = new TileLayer({
+  // https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Tile_servers
+  data: 'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png',
+
+  zoom: INITIAL_VIEW_STATE.zoom,
+  minZoom: INITIAL_VIEW_STATE.minZoom,
+  maxZoom: INITIAL_VIEW_STATE.maxZoom,
+  tileSize: 256,
+
+  renderSubLayers: props => {
+    const {
+      bbox: {west, south, east, north}
+    } = props.tile;
+
+    return new BitmapLayer(props, {
+      data: null,
+      image: props.data,
+      bounds: [west, south, east, north]
+    });
+  }
+});
 
 
 var tripData = []
@@ -250,16 +274,22 @@ async function animate() {
   if (tm == 0) {
       // maybe we could load the data here and initialize all paths.
       // don't know how to do this yet ...
+    } else {
+      if (!video.recording) {
+        video.startRecoding()
+      }
     }
     if (tm < 15000) {
         tm += speed
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)
         setView()
-        deckgl.setProps({layers: [trips, scatter, bmap, bg]});
+        //deckgl.setProps({layers: [tiles, trips, scatter, bmap, bg]});
+        deckgl.setProps({layers: [tiles, trips, scatter]});
         setTimeout(animate,100)
     } else {
         console.log("Finished")
+        video.recorder.stop()
         tm = restartTime
         setTimeout(animate,100)
     }
@@ -277,4 +307,53 @@ fetch("/data/trips.json")
 )
 */
 setTimeout(animate,1000)
+
+// ------ video 
+
+const video = {
+  chunks: [], 
+  stream: null,
+  recorder: null,
+  blob: null,
+  recording: false,
+
+  startRecoding: function () {
+    const canvas = document.getElementById("cv")
+    if (!canvas) return
+    console.log("Canvas:",canvas)
+    video.stream = canvas.captureStream(); // fps// Create media recorder from canvas stream
+    // available codecs must be tested. edge supports webm/vp9, firefox doesnt
+    video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm" });// Record data in chunks array when data is available
+    /*
+    try {
+      video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm; codecs=vp9" });// Record data in chunks array when data is available
+    } catch (e) {
+      video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm; codecs=vp8" });// Record data in chunks array when data is available
+    }
+    */
+    video.recorder.ondataavailable = (evt) => { video.chunks.push(evt.data); };// Provide recorded data when recording stops
+    video.recorder.onstop = () => {video.stopRecoding(video.chunks);}// Start recording using a 1s timeslice [ie data is made available every 1s)
+    video.recorder.start();
+    video.recording = true
+
+  },
+  stopRecoding: function (chunks) {
+    video.blob = new Blob(chunks, {type: "video/webm" });
+    const recording_url = URL.createObjectURL(video.blob);// Attach the object URL to an <a> element, setting the download file name
+    const a = document.createElement('a');
+    a.href = recording_url;
+    a.id = "down"
+    a.download = "video-app4.webm"
+    a.innerHTML = "Download"
+    document.getElementById("ui").appendChild(a)// Trigger the file download
+    // maybe this too. triggers immediate download ...
+    a.click()
+    setTimeout(() => {
+      // Clean up - see https://stackoverflow.com/a/48968694 for why it is in a timeout
+      URL.revokeObjectURL(recording_url);
+      document.getElementById("ui").removeChild(a);
+    }, 0);
+    
+  },
+}
 
