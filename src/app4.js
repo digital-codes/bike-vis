@@ -310,6 +310,10 @@ setTimeout(animate,1000)
 
 // ------ video 
 
+// ffmpeg -err_detect ignore_err -i video-app4.webm -c copy v.webm
+
+
+
 const video = {
   chunks: [], 
   stream: null,
