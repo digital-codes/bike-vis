@@ -1,5 +1,7 @@
 # bike-vis
 
+Inspired by https://github.com/technologiestiftung/bikesharing-vis
+
 
 ## Export video
 
