@@ -4,16 +4,29 @@
     <title>Bike trips example</title>
     <link rel="stylesheet" href="/css/leaflet.css">
     <style>
-      #map {
+      #top {
+        position:relative;
+      }
+      #ui {
         position: absolute;
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
+        height: 4vh;
+      }
+      #map {
+        position: absolute;
+        top: 4vh;
+        left: 0;
+        width: 100vw;
+        height: 95vh;
       }
     </style>
   </head>
   <body>
-    <div id="map"></div>
+    <div id="top">
+      <div id="ui"></div>
+      <div id="map"></div>
+    </div>
   </body>
 </html>
