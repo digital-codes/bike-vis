@@ -337,9 +337,9 @@ const video = {
     video.recording = true
 
   },
-  stopRecoding: function (chunks) {
+  stopRecoding: async function (chunks) {
     video.blob = new Blob(chunks, {type: "video/webm" });
-    const recording_url = URL.createObjectURL(video.blob);// Attach the object URL to an <a> element, setting the download file name
+    const recording_url = await URL.createObjectURL(video.blob);// Attach the object URL to an <a> element, setting the download file name
     const a = document.createElement('a');
     a.href = recording_url;
     a.id = "down"
@@ -352,7 +352,7 @@ const video = {
       // Clean up - see https://stackoverflow.com/a/48968694 for why it is in a timeout
       URL.revokeObjectURL(recording_url);
       document.getElementById("ui").removeChild(a);
-    }, 0);
+    }, 5000);
     
   },
 }

@@ -17,3 +17,6 @@
  * let image = canvas.toDataURL('image/jpeg');
 
  
+Videos can be incomplete, fix by:
+
+> ffmpeg -err_detect ignore_err -i video-app4.webm -c copy v.webm
