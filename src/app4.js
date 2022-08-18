@@ -23,6 +23,11 @@ https://deck.gl/docs/api-reference/layers/bitmap-layer
 
 https://deck.gl/docs/api-reference/geo-layers/tile-layer
 
+https://deck.gl/docs/api-reference/layers/text-layer
+
+https://deck.gl/docs/api-reference/layers/path-layer
+
+
 */
 
 import {Deck} from '@deck.gl/core';
@@ -31,6 +36,9 @@ import {ScatterplotLayer} from '@deck.gl/layers';
 import {PolygonLayer} from '@deck.gl/layers';
 import {BitmapLayer} from '@deck.gl/layers';
 import {TileLayer} from '@deck.gl/geo-layers';
+import {TextLayer} from '@deck.gl/layers';
+
+
 
 //import {MapView} from '@deck.gl/core';
 
@@ -150,6 +158,24 @@ const tiles = new TileLayer({
 });
 
 
+const labels = new TextLayer({
+  id: 'text-layer',
+  data: [
+    {
+      name:"Label",
+      coordinates: [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude]
+    },
+  ],
+  pickable: true,
+  getPosition: d => d.coordinates,
+  getText: d => d.name,
+  getSize: 32,
+  getAngle: 0,
+  getTextAnchor: 'middle',
+  getAlignmentBaseline: 'center'
+});
+
+
 var tripData = []
 
 async function mkTrips(tm = 500) {
@@ -212,9 +238,9 @@ const deckgl = new Deck({
     //mapStyle: '/data/sf-style.json', // trips
     //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
   initialViewState: INITIAL_VIEW_STATE,
-  controller: true,
+  controller: {dragRotate: false}, //true,
   effects: DEFAULT_THEME.effects,
-  layers: [scatter,bmap,bg],
+  layers: [labels,bmap,bg],
 
 });
   
@@ -286,7 +312,23 @@ async function animate() {
         const trips = await mkTrips(tm)
         setView()
         //deckgl.setProps({layers: [tiles, trips, scatter, bmap, bg]});
-        deckgl.setProps({layers: [tiles, trips, scatter]});
+        await deckgl.setProps({layers: [tiles, trips, labels]});
+
+        var canvas = document.getElementById("cv") || null;
+        if (canvas) {
+          console.log("Canvas")
+          var ctx = await canvas.getContext("webgl2") || null;
+          // for handling text in webgl2 see e.g. 
+          // https://webgl2fundamentals.org/webgl/lessons/webgl-text-html.html
+          /*
+          if (ctx) {
+            console.log("Context")
+            ctx.font = "30px Arial";
+            await ctx.fillText("Hello World", 10, 50); 
+          }
+          */
+        }
+
         setTimeout(animate,100)
     } else {
         console.log("Finished")
