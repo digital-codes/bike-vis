@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trips example</title>
+
+    <style>
+    #deck {
+      position:relative;
+    }
+    #cv {
+      /* default settings for w and h, needed? 
+      width: 600px;
+      height: 400px;
+      */
+      border: 1px solid slategray;
+      overflow: hidden;
+    }
+    #restart {
+      border: 1px solid #f00;
+      padding: 3px;
+    }
+    </style>
+
+  </head>
+  <body>
+    <div id="ui" class="slidecontainer">
+      <p>Speed</p>
+      <input id="sets" type="range" min="10" max="500" value="10">
+      <div>
+        <button id="restart">Restart</button>
+      </div>
+    </div> 
+    <!--
+      we can scale the container to adjust canvas size
+      transform: scale(.4);
+      transform-origin: left;
+    -->
+    <div id="deck">
+      <canvas id="cv">
+      </canvas>
+    </div>
+  </body>
+</html>
