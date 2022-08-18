@@ -64,8 +64,8 @@ const DEFAULT_THEME = {
 };
 
 const INITIAL_VIEW_STATE = {
-    longitude: -122.4,
-    latitude: 37.74,
+    longitude: 8.4013, // -122.4,
+    latitude: 49.0045, // 37.74,
     zoom: 11,
     minZoom: 0,
     maxZoom: 20,
@@ -155,7 +155,7 @@ var tripData = []
 async function mkTrips(tm = 500) {
   const trips = await new TripsLayer({
     id: 'TripsLayer',
-    data: '/data/trips2.json', // sf-trips.json',
+    data: '/data/lanes.json, // trips2.json', // sf-trips.json',
     
     /* props from TripsLayer class */
     
