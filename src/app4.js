@@ -155,7 +155,7 @@ var tripData = []
 async function mkTrips(tm = 500) {
   const trips = await new TripsLayer({
     id: 'TripsLayer',
-    data: '/data/lanes.json, // trips2.json', // sf-trips.json',
+    data: '/data/lanes.json', // trips2.json', // sf-trips.json',
     
     /* props from TripsLayer class */
     

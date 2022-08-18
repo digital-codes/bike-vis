@@ -25,7 +25,7 @@ df["year"] = df.VORGANGSZE.apply(yrs)
 
 #df.to_file("lanes.geojson")
 #select 20212
-year = 2022 # 15 in 2022, 1400 in 2012
+year = 2012 # 15 in 2022, 1400 in 2012
 df.drop(index=(df[df.year != year]).index,inplace=True)
 df.reset_index(inplace=True)
 df.to_file("lanes.geojson")
@@ -41,13 +41,12 @@ for i in list(df.index):
     speed = random.randint(100,300)
     for c in df.geometry[i].coords:
         trip["waypoints"].append({
-            "coordinates":[c[1],c[0]],
+            "coordinates":[c[0],c[1]],
             "timestamp":tm,
             "color":[0,0,200]
             }
         )
         tm += speed
-        print(tm)
     trips.append(trip)
 
     
