@@ -165,7 +165,8 @@ async function mkTrips(tm = 500) {
     //getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
     getTimestamps: d => d.waypoints.map(p => p.timestamp),
     //getColor: [253, 128, 93],
-    getColor: d => d.waypoints.map(p => p.color),
+    // can use color from trip, don't neet color per point
+    getColor: d => d.color, // d.waypoints.map(p => p.color),
     trailLength: 600,
     
     /* props inherited from PathLayer class */

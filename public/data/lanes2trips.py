@@ -36,13 +36,18 @@ df.to_file("lanes.geojson")
 
 trips = []
 for i in list(df.index):
-    trip = {"waypoints":[]}
+    trip = {
+        "year":int(df.year[i]),
+        "color":[0,200,0],
+        "waypoints":[],
+    }
     tm = random.randint(100,1000)
     speed = random.randint(100,300)
     for c in df.geometry[i].coords:
         trip["waypoints"].append({
             "coordinates":[c[0],c[1]],
             "timestamp":tm,
+            # color can be set for trip also
             "color":[0,0,200]
             }
         )
