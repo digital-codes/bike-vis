@@ -44,7 +44,7 @@ import {MapView} from '@deck.gl/core';
 const INITIAL_VIEW_STATE = {
   longitude: 8.4013, // -122.4,
   latitude: 49.0045, // 37.74,
-  zoom: 11,
+  zoom: 12,
   minZoom: 0,
   maxZoom: 20,
   pitch: 0, // (Number, optional) - pitch angle in degrees. Default 0 (top-down). was 30
@@ -210,7 +210,7 @@ const deckgl = new Deck({
 });
   
 var tm = 0;
-var speed = 10
+var speed = .50
 
 function setS(e) {
   speed = parseInt(e.target.value)
@@ -237,7 +237,7 @@ async function animate() {
         video.startRecoding()
       }
     }
-    if (tm < 5000) {
+    if (tm < 12 * 52) {
         tm += speed
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)

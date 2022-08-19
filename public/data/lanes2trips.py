@@ -21,12 +21,27 @@ print("Items remaining:", len(df))
 def yrs(x):
     return dt.datetime.strptime(str(x),"%Y-%m-%d %H:%M:%S").date().year
 
+def doy(x):
+    return x.timetuple().tm_yday
+
+def woy(x):
+    return x.isocalendar()[1]
+
+
 df["year"] = df.VORGANGSZE.apply(yrs)
+
+df["day"] = df.VORGANGSZE.apply(doy)
+df["week"] = df.VORGANGSZE.apply(woy)
 
 #df.to_file("lanes.geojson")
 #select 20212
-year = 2012 # 15 in 2022, 1400 in 2012
-df.drop(index=(df[df.year != year]).index,inplace=True)
+#year = 2012 # 15 in 2022, 1400 in 2012
+#df.drop(index=(df[df.year != year]).index,inplace=True)
+
+# drop 1980
+df.drop(index=(df[df.year == 1980]).index,inplace=True)
+
+
 df.reset_index(inplace=True)
 df.to_file("lanes.geojson")
 
@@ -38,17 +53,22 @@ trips = []
 for i in list(df.index):
     trip = {
         "year":int(df.year[i]),
-        "color":[0,200,0],
+        "week":int(df.week[i]),
+        "day":int(df.day[i]),
+        "color":[200,0,0],
         "waypoints":[],
     }
-    tm = random.randint(100,1000)
-    speed = random.randint(100,300)
+    #tm = random.randint(100,1000)
+    #speed = random.randint(100,300)
+    tm = int((df.year[i] - df.year.min())*52 + df.week[i])
+    segments = len(list(df.geometry[i].coords))
+    speed = 4 / segments # 4 weeks per track ...
     for c in df.geometry[i].coords:
         trip["waypoints"].append({
             "coordinates":[c[0],c[1]],
             "timestamp":tm,
             # color can be set for trip also
-            "color":[0,0,200]
+            #"color":[0,0,200]
             }
         )
         tm += speed
