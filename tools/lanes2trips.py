@@ -8,8 +8,9 @@ import sys
 import random
 import json
 
+DATADIR = "../public/data"
 
-df = gp.read_file("bikelanes.geojson")
+df = gp.read_file(f"{DATADIR}/bikelanes.geojson")
 print("CRS:",df.crs)
 print("Items read:", len(df))
 
@@ -33,7 +34,6 @@ df["year"] = df.VORGANGSZE.apply(yrs)
 df["day"] = df.VORGANGSZE.apply(doy)
 df["week"] = df.VORGANGSZE.apply(woy)
 
-#df.to_file("lanes.geojson")
 #select 20212
 #year = 2012 # 15 in 2022, 1400 in 2012
 #df.drop(index=(df[df.year != year]).index,inplace=True)
@@ -43,7 +43,7 @@ df.drop(index=(df[df.year == 1980]).index,inplace=True)
 
 
 df.reset_index(inplace=True)
-df.to_file("lanes.geojson")
+df.to_file(f"{DATADIR}/lanes.geojson")
 
 #for c in df.geometry[0].coords:
 #	print(c)
@@ -55,7 +55,7 @@ for i in list(df.index):
         "year":int(df.year[i]),
         "week":int(df.week[i]),
         "day":int(df.day[i]),
-        "color":[200,0,0],
+        "color":[0,0,200],
         "waypoints":[],
     }
     #tm = random.randint(100,1000)
@@ -75,7 +75,7 @@ for i in list(df.index):
     trips.append(trip)
 
     
-with open("lanes.json","w") as f:
+with open(f"{DATADIR}/lanes.json","w") as f:
     json.dump(trips,f)
 
     

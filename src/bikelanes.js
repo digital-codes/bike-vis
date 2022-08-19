@@ -117,7 +117,7 @@ async function mkTrips(tm = 500) {
     /* props from TripsLayer class */
     
     currentTime: tm,
-    //fadeTrail: true,
+    //fadeTrail: false, // default: true
     // modify timetamps
     //getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
     getTimestamps: d => d.waypoints.map(p => p.timestamp),
@@ -213,7 +213,7 @@ var tm = 0;
 var speed = .50
 
 function setS(e) {
-  speed = parseInt(e.target.value)
+  speed = parseInt(e.target.value/10)
   console.log("Speed:",speed)
 }
 
@@ -237,11 +237,13 @@ async function animate() {
         video.startRecoding()
       }
     }
-    if (tm < 12 * 52) {
+    if (tm < 11 * 52) {
         tm += speed
         //console.log("Current:",tm)
         const trips = await mkTrips(tm)
-        const labels = await mkLabel(tm)
+        // time is in weeks, first year is 2012
+        const year = Math.floor(2012 + tm/52)
+        const labels = await mkLabel(year)
         //deckgl.setProps({layers: [tiles, trips, scatter, bmap, bg]});
         await deckgl.setProps({layers: [tiles, trips, labels]});
         /*

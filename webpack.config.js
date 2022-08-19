@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
-    index: './src/app5.js',  
+    index: './src/bikelanes.js',  
     //index: './src/bike-app.js',  
   },
   plugins: [
@@ -14,7 +14,7 @@ module.exports = {
       // Template only for leaflet 
       // remove if not required
       //template: 'bike-app.html'
-      template: 'app5.html',
+      template: 'bikelanes.html',
       meta: [
         {"description":"Bike trak visualization with DeckGL"},
         {"name":"viewport", "content":"width=device-width, initial-scale=1"},
