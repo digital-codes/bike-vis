@@ -30,16 +30,28 @@ https://deck.gl/docs/api-reference/layers/path-layer
 
 */
 
-import {Deck} from '@deck.gl/core';
+import { Deck } from '@deck.gl/core';
 import { TripsLayer } from '@deck.gl/geo-layers';
-import {ScatterplotLayer} from '@deck.gl/layers';
-import {PolygonLayer} from '@deck.gl/layers';
-import {BitmapLayer} from '@deck.gl/layers';
-import {TileLayer} from '@deck.gl/geo-layers';
-import {TextLayer} from '@deck.gl/layers';
+import { ScatterplotLayer } from '@deck.gl/layers';
+import { PolygonLayer } from '@deck.gl/layers';
+import { BitmapLayer } from '@deck.gl/layers';
+import { TileLayer } from '@deck.gl/geo-layers';
+import { TextLayer } from '@deck.gl/layers';
+
+import { MapView } from '@deck.gl/core';
 
 
-import {MapView} from '@deck.gl/core';
+// generate video or not
+const mkVideo = false
+
+var tripData = []
+var startYear = 0
+var stopYear = 0
+var startWeek = 0
+var tm = startWeek
+var speed = 5
+
+
 
 const INITIAL_VIEW_STATE = {
   longitude: 8.4013, // -122.4,
@@ -75,7 +87,7 @@ const tiles = new TileLayer({
 
   renderSubLayers: props => {
     const {
-      bbox: {west, south, east, north}
+      bbox: { west, south, east, north }
     } = props.tile;
 
     return new BitmapLayer(props, {
@@ -103,19 +115,17 @@ async function mkLabel(lbl = "Jahr ...") {
     getTextAnchor: 'middle',
     getAlignmentBaseline: 'center'
   })
- return labels
+  return labels
 }
 
-
-var tripData = []
 
 async function mkTrips(tm = 500) {
   const trips = await new TripsLayer({
     id: 'TripsLayer',
-    data: '/data/lanes.json', // trips2.json', // sf-trips.json',
-    
+    data: tripData, //'/data/lanes.json', // trips2.json', // sf-trips.json',
+
     /* props from TripsLayer class */
-    
+
     currentTime: tm,
     //fadeTrail: false, // default: true
     // modify timetamps
@@ -125,9 +135,9 @@ async function mkTrips(tm = 500) {
     // can use color from trip, don't neet color per point
     getColor: d => d.color, // d.waypoints.map(p => p.color),
     trailLength: 600,
-    
+
     /* props inherited from PathLayer class */
-    
+
     // billboard: false,
     capRounded: true,
     getPath: d => d.waypoints.map(p => p.coordinates),
@@ -139,9 +149,9 @@ async function mkTrips(tm = 500) {
     widthMinPixels: 8,
     // widthScale: 1,
     // widthUnits: 'meters',
-    
+
     /* props inherited from Layer class */
-    
+
     // autoHighlight: false,
     // coordinateOrigin: [0, 0, 0],
     // coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
@@ -151,14 +161,13 @@ async function mkTrips(tm = 500) {
     // pickable: false,
     // visible: true,
     // wrapLongitude: false,
-  
+
   });
   return trips
-}    
+}
 
-//var trackData
 
-function layerFilter({layer, viewport}) {
+function layerFilter({ layer, viewport }) {
   if (viewport.id === 'label' && layer.id === 'TripsLayer') {
     // Exclude layer on view
     return false;
@@ -171,35 +180,32 @@ function layerFilter({layer, viewport}) {
   }
   //console.log("Filter:",layer,viewport)
   return true;
-} 
+}
 
-//new DeckGL({
 const deckgl = new Deck({
-    // The container to append the auto-created canvas to.
-    parent: document.getElementById("#deck"), //document.body,
-    canvas: "cv", // document.getElementById("#cv"), // unset
-    width: "1280",
-    height: "720px",
-    //mapStyle: '/data/sf-style.json', // trips
-    //mapStyle: "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json",
+  // The container to append the auto-created canvas to.
+  parent: document.getElementById("#deck"), //document.body,
+  canvas: "cv", // document.getElementById("#cv"), // unset
+  width: "1280",
+  height: "720px",
   initialViewState: INITIAL_VIEW_STATE,
-  controller: {dragRotate: false}, //true,
+  controller: { dragRotate: false }, //true,
   layerFilter: layerFilter,
   layers: [tiles],
   views: [
     new MapView({
-      id:"map",
+      id: "map",
       initialViewState: INITIAL_VIEW_STATE,
-      controller: {dragRotate: false},
+      controller: { dragRotate: false },
       x: 0,
-      y: 0, 
+      y: 0,
       width: "100%",
       height: "100%",
     }),
     new MapView({
-      id:"label",
+      id: "label",
       x: 0,
-      y: 0, 
+      y: 0,
       width: "100px",
       height: "30px",
       initialViewState: LABEL_VIEW_STATE,
@@ -208,21 +214,18 @@ const deckgl = new Deck({
   ]
 
 });
-  
-var tm = 0;
-var speed = .50
 
 function setS(e) {
-  speed = parseInt(e.target.value/10)
-  console.log("Speed:",speed)
+  speed = parseInt(e.target.value)
+  console.log("Speed:", speed)
 }
 
 async function restart() {
-  tm = 0
+  tm = startWeek
 }
 
-document.getElementById("sets").addEventListener("input",setS)
-document.getElementById("restart").addEventListener("click",restart)
+document.getElementById("sets").addEventListener("input", setS)
+document.getElementById("restart").addEventListener("click", restart)
 
 async function animate() {
   const tmVal = document.getElementById("tm") || null
@@ -230,58 +233,57 @@ async function animate() {
     tmVal.innerHTML = tm.toString()
 
   if (tm == 0) {
-      // maybe we could load the data here and initialize all paths.
-      // don't know how to do this yet ...
-    } else {
-      if (!video.recording) {
-        video.startRecoding()
-      }
-    }
-    if (tm < 11 * 52) {
-        tm += speed
-        //console.log("Current:",tm)
-        const trips = await mkTrips(tm)
-        // time is in weeks, first year is 2012
-        const year = Math.floor(2012 + tm/52)
-        const labels = await mkLabel(year)
-        //deckgl.setProps({layers: [tiles, trips, scatter, bmap, bg]});
-        await deckgl.setProps({layers: [tiles, trips, labels]});
-        /*
-        var canvas = document.getElementById("cv") || null;
-        if (canvas) {
-          console.log("Canvas")
-          var ctx = await canvas.getContext("webgl2") || null;
-          // for handling text in webgl2 see e.g. 
-          // https://webgl2fundamentals.org/webgl/lessons/webgl-text-html.html
-          if (ctx) {
-            console.log("Context")
-            ctx.font = "30px Arial";
-            await ctx.fillText("Hello World", 10, 50); 
-          }
-        }
-        */
-
-        setTimeout(animate,100)
-    } else {
-        console.log("Finished")
-        video.recorder.stop()
-        tm = 0
-        setTimeout(animate,100)
+    // maybe we could load the data here and initialize all paths.
+    // don't know how to do this yet ...
+  } else {
+    if (mkVideo && !video.recording) {
+      video.startRecoding()
     }
   }
-
-/*
-  // load data 
-fetch("/data/trips.json")
-.then((response) => response.json())
-.then((data) => {
-  console.log(data.data)
-  tripData = data.data
-  setTimeout(animate,1000)
+  if (tm < (stopYear - startYear + 1) * 52) {
+    tm += speed / 10 // speed is int, scale here
+    //console.log("Current:",tm)
+    const trips = await mkTrips(tm)
+    // time is in weeks, first year is 2012
+    const year = Math.floor(startYear + tm / 52)
+    const labels = await mkLabel(year)
+    //deckgl.setProps({layers: [tiles, trips, scatter, bmap, bg]});
+    await deckgl.setProps({ layers: [tiles, trips, labels] });
+    setTimeout(animate, 100)
+  } else {
+    console.log("Finished")
+    if (mkVideo) video.recorder.stop()
+    tm = 0
+    setTimeout(animate, 100)
   }
-)
-*/
-setTimeout(animate,1000)
+}
+
+
+// load data 
+fetch("/data/lanes.json")
+  .then((response) => {
+    if (!response.ok) {
+      alert("Fetch failed: ", response.status)
+      throw (new Error("HTTP error!"))
+    }
+    console.log("Fetch status", response.status)
+    return response.json()
+  }
+  )
+  .then((data) => {
+    //console.log("Fetch data",data)
+    tripData = data
+    startYear = data[0].year
+    startWeek = data[0].week
+    stopYear = data[data.length - 1].year
+    console.log("Start/stop:", startYear, stopYear)
+    const evt = new Event('input', { bubbles: true })
+    document.getElementById("sets").dispatchEvent(evt) // set initial speed
+    setTimeout(animate, 1000) // start animation
+  }
+  )
+
+//setTimeout(animate,1000)
 
 // ------ video 
 
@@ -290,7 +292,7 @@ setTimeout(animate,1000)
 
 
 const video = {
-  chunks: [], 
+  chunks: [],
   stream: null,
   recorder: null,
   blob: null,
@@ -299,7 +301,7 @@ const video = {
   startRecoding: function () {
     const canvas = document.getElementById("cv")
     if (!canvas) return
-    console.log("Canvas:",canvas)
+    console.log("Canvas:", canvas)
     video.stream = canvas.captureStream(); // fps// Create media recorder from canvas stream
     // available codecs must be tested. edge supports webm/vp9, firefox doesnt
     video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm" });// Record data in chunks array when data is available
@@ -311,13 +313,13 @@ const video = {
     }
     */
     video.recorder.ondataavailable = (evt) => { video.chunks.push(evt.data); };// Provide recorded data when recording stops
-    video.recorder.onstop = () => {video.stopRecoding(video.chunks);}// Start recording using a 1s timeslice [ie data is made available every 1s)
+    video.recorder.onstop = () => { video.stopRecoding(video.chunks); }// Start recording using a 1s timeslice [ie data is made available every 1s)
     video.recorder.start();
     video.recording = true
 
   },
   stopRecoding: async function (chunks) {
-    video.blob = new Blob(chunks, {type: "video/webm" });
+    video.blob = new Blob(chunks, { type: "video/webm" });
     const recording_url = await URL.createObjectURL(video.blob);// Attach the object URL to an <a> element, setting the download file name
     const a = document.createElement('a');
     a.href = recording_url;
@@ -332,7 +334,7 @@ const video = {
       URL.revokeObjectURL(recording_url);
       document.getElementById("ui").removeChild(a);
     }, 5000);
-    
+
   },
 }
 

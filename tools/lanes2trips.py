@@ -41,7 +41,7 @@ df["week"] = df.VORGANGSZE.apply(woy)
 # drop 1980
 df.drop(index=(df[df.year == 1980]).index,inplace=True)
 
-
+df.sort_values(by="VORGANGSZE",inplace=True)
 df.reset_index(inplace=True)
 df.to_file(f"{DATADIR}/lanes.geojson")
 
