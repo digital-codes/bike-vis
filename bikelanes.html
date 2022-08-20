@@ -16,6 +16,9 @@
       */
       border: 1px solid slategray;
       overflow: hidden;
+      /* transform, if required */
+      transform: scale(.5);
+      transform-origin: left top 0px;
     }
     #restart {
       border: 1px solid #f00;
@@ -34,8 +37,8 @@
     </div> 
     <!--
       we can scale the container to adjust canvas size
-      transform: scale(.4);
-      transform-origin: left;
+      transform: scale(.5);
+      transform-origin: left top 0px;
     -->
     <div id="deck">
       <canvas id="cv">

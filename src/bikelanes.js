@@ -56,9 +56,9 @@ var speed = 5
 const INITIAL_VIEW_STATE = {
   longitude: 8.4013, // -122.4,
   latitude: 49.0045, // 37.74,
-  zoom: 12,
+  zoom: 13,
   minZoom: 0,
-  maxZoom: 20,
+  maxZoom: 19,
   pitch: 0, // (Number, optional) - pitch angle in degrees. Default 0 (top-down). was 30
   bearing: 0 //  (Number, optional) - bearing angle in degrees. Default 0 (north).
 };
@@ -84,6 +84,11 @@ const tiles = new TileLayer({
   minZoom: INITIAL_VIEW_STATE.minZoom,
   maxZoom: INITIAL_VIEW_STATE.maxZoom,
   tileSize: 256,
+
+  /*
+  one tile for center plus adjacent rows and columns
+  e.g. 512*256 => 6 tiles: 1 center plus 5 surroundings 
+  */
 
   renderSubLayers: props => {
     const {
@@ -186,7 +191,7 @@ const deckgl = new Deck({
   // The container to append the auto-created canvas to.
   parent: document.getElementById("#deck"), //document.body,
   canvas: "cv", // document.getElementById("#cv"), // unset
-  width: "1280",
+  width: "1280px",
   height: "720px",
   initialViewState: INITIAL_VIEW_STATE,
   controller: { dragRotate: false }, //true,
