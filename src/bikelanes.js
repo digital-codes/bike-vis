@@ -47,7 +47,7 @@ const mkVideo = false
 var tripData = []
 var startYear = 0
 var stopYear = 0
-var startWeek = 0
+var startWeek = 20
 var tm = startWeek
 var speed = 5
 
@@ -237,7 +237,7 @@ async function animate() {
   if (tmVal != null)
     tmVal.innerHTML = tm.toString()
 
-  if (tm == 0) {
+  if (tm == startWeek) {
     // maybe we could load the data here and initialize all paths.
     // don't know how to do this yet ...
   } else {
@@ -258,7 +258,7 @@ async function animate() {
   } else {
     console.log("Finished")
     if (mkVideo) video.recorder.stop()
-    tm = 0
+    tm = startWeek
     setTimeout(animate, 100)
   }
 }
@@ -279,7 +279,11 @@ fetch("/data/lanes.json")
     //console.log("Fetch data",data)
     tripData = data
     startYear = data[0].year
-    startWeek = data[0].week
+    
+  
+  
+  
+  eek = data[0].week
     stopYear = data[data.length - 1].year
     console.log("Start/stop:", startYear, stopYear)
     const evt = new Event('input', { bubbles: true })
