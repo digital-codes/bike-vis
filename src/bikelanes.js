@@ -274,7 +274,11 @@ fetch("/data/lanes.json")
     //console.log("Fetch data",data)
     tripData = data
     startYear = data[0].year
-    startWeek = data[0].week
+    
+  
+  
+  
+  eek = data[0].week
     stopYear = data[data.length - 1].year
     console.log("Start/stop:", startYear, stopYear)
     const evt = new Event('input', { bubbles: true })
