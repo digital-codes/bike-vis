@@ -17,20 +17,28 @@
       border: 1px solid slategray;
       overflow: hidden;
       /* transform, if required */
-      transform: scale(.5);
+      transform: scale(.7);
       transform-origin: left top 0px;
     }
     #restart {
       border: 1px solid #f00;
       padding: 3px;
     }
+    #ui {
+      margin-bottom: .5rem;;
+    }
     </style>
 
   </head>
   <body>
+    <div id="info">
+      <p>Zubau Radwege in Karlsruhe seit 2007</p>
+      <em>Speed</em> variiert Darstellungsgeschwindigkeit. <em>Restart</em> beginnt neu ab 2007.
+    </div> 
+
     <div id="ui" class="slidecontainer">
       <p>Speed</p>
-      <input id="sets" type="range" min="1" max="50" value="10">
+      <input id="sets" type="range" min="1" max="50" value="10"><span id="sp"></span>
       <div>
         <button id="restart">Restart</button>
       </div>
