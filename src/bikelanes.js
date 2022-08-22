@@ -40,23 +40,19 @@ import { TextLayer } from '@deck.gl/layers';
 
 import { MapView } from '@deck.gl/core';
 
-
-// generate video or not
-const mkVideo = false
-
 var tripData = []
 var startYear = 0
 var stopYear = 0
 var startWeek = 20
 var tm = startWeek
 var speed = 5
-
+var fadeTrips = false
 
 
 const INITIAL_VIEW_STATE = {
   longitude: 8.4013, // -122.4,
   latitude: 49.0045, // 37.74,
-  zoom: 13,
+  zoom: 12,
   minZoom: 0,
   maxZoom: 19,
   pitch: 0, // (Number, optional) - pitch angle in degrees. Default 0 (top-down). was 30
@@ -113,6 +109,9 @@ async function mkLabel(lbl = "Jahr ...") {
       },
     ],
     pickable: false,
+    background: true,
+    getBackgroundColor: [255,255,255],
+    backgroundPadding: [10,10],
     getPosition: d => d.coordinates,
     getText: d => d.name,
     getSize: 24,
@@ -132,7 +131,7 @@ async function mkTrips(tm = 500) {
     /* props from TripsLayer class */
 
     currentTime: tm,
-    //fadeTrail: false, // default: true
+    fadeTrail: fadeTrips, // default: true
     // modify timetamps
     //getTimestamps: d => d.waypoints.map(p => p.timestamp - 1554772579000),
     getTimestamps: d => d.waypoints.map(p => p.timestamp),
@@ -222,7 +221,8 @@ const deckgl = new Deck({
 
 function setS(e) {
   speed = parseInt(e.target.value)
-  console.log("Speed:", speed)
+  document.getElementById("sp").innerHTML = speed.toString()
+  //console.log("Speed:", speed)
 }
 
 async function restart() {
@@ -240,10 +240,6 @@ async function animate() {
   if (tm == startWeek) {
     // maybe we could load the data here and initialize all paths.
     // don't know how to do this yet ...
-  } else {
-    if (mkVideo && !video.recording) {
-      video.startRecoding()
-    }
   }
   if (tm < (stopYear - startYear + 1) * 52) {
     tm += speed / 10 // speed is int, scale here
@@ -257,7 +253,6 @@ async function animate() {
     setTimeout(animate, 100)
   } else {
     console.log("Finished")
-    if (mkVideo) video.recorder.stop()
     tm = startWeek
     setTimeout(animate, 100)
   }
@@ -289,57 +284,4 @@ fetch("/data/lanes.json")
   )
 
 //setTimeout(animate,1000)
-
-// ------ video 
-
-// ffmpeg -err_detect ignore_err -i video-app4.webm -c copy v.webm
-
-
-
-const video = {
-  chunks: [],
-  stream: null,
-  recorder: null,
-  blob: null,
-  recording: false,
-
-  startRecoding: function () {
-    const canvas = document.getElementById("cv")
-    if (!canvas) return
-    console.log("Canvas:", canvas)
-    video.stream = canvas.captureStream(); // fps// Create media recorder from canvas stream
-    // available codecs must be tested. edge supports webm/vp9, firefox doesnt
-    video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm" });// Record data in chunks array when data is available
-    /*
-    try {
-      video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm; codecs=vp9" });// Record data in chunks array when data is available
-    } catch (e) {
-      video.recorder = new MediaRecorder(video.stream, { mimeType: "video/webm; codecs=vp8" });// Record data in chunks array when data is available
-    }
-    */
-    video.recorder.ondataavailable = (evt) => { video.chunks.push(evt.data); };// Provide recorded data when recording stops
-    video.recorder.onstop = () => { video.stopRecoding(video.chunks); }// Start recording using a 1s timeslice [ie data is made available every 1s)
-    video.recorder.start();
-    video.recording = true
-
-  },
-  stopRecoding: async function (chunks) {
-    video.blob = new Blob(chunks, { type: "video/webm" });
-    const recording_url = await URL.createObjectURL(video.blob);// Attach the object URL to an <a> element, setting the download file name
-    const a = document.createElement('a');
-    a.href = recording_url;
-    a.id = "down"
-    a.download = "video-app4.webm"
-    a.innerHTML = "Download"
-    document.getElementById("ui").appendChild(a)// Trigger the file download
-    // maybe this too. triggers immediate download ...
-    a.click()
-    setTimeout(() => {
-      // Clean up - see https://stackoverflow.com/a/48968694 for why it is in a timeout
-      URL.revokeObjectURL(recording_url);
-      document.getElementById("ui").removeChild(a);
-    }, 5000);
-
-  },
-}
 
